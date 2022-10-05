@@ -81,6 +81,8 @@ body{
     width: 100%;
     align-items: center;
     justify-content: center;
+    overflow-y: scroll;
+    justify-content: start;
 }
 
 .future-forecast .today{
