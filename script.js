@@ -1,17 +1,16 @@
-const timeEl = document.getElementById('time');
-const dateEl = document.getElementById('date');
+var timeEl = document.getElementById('time');
+var dateEl = document.getElementById('date');
 var currentWeatherItemsEl = document.getElementById('current-weather-items');
-const timezone = document.getElementById('time-zone');
-const countryEl = document.getElementById('country');
-const weatherForecastEl = document.getElementById('weather-forecast');
-const currentTempEl = document.getElementById('current-temp');
-
+var timezone = document.getElementById('time-zone');
+var countryEl = document.getElementById('country');
+var weatherForecastEl = document.getElementById('weather-forecast');
+var currentTempEl = document.getElementById('current-temp');
 
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-const API_KEY = '49cc8c821cd2aff9af04c9f98c36eb74';
+const API_KEY = '073bbc27e735a8958d7630483943b6af';
 setInterval(() => {
     const time = new Date();
     const month = time.getMonth();
@@ -33,20 +32,19 @@ getWeatherData()
 function getWeatherData(){
     navigator.geolocation.getCurrentPosition((success) => {
             let {latitude, longitude} = success.coords;
-
-            fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=hourly,minutely&units=metric&appid=${API_KEY}`).then(res => res.json()).then(data => {
-            console.log(data);
-            showWeatherData(data);
-        })
+                fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&exclude=hourly,minutely&units=metric&appid=${API_KEY}`).then(res => res.json()).then(data => {
+                console.log(data);
+                showWeatherData(data);
+            })
         
     })
 }
-
 function showWeatherData(data){
-    let {humidity, pressure, sunrise, sunset, wind_speed}=data.current;
+    let {humidity, pressure}=data.list[0].main;
+    let {sunrise, sunset}=data.city;
 
-    timezone.innerHTML = data.timezone;
-    countryEl.innerHTML = data.lat + 'N ' + data.lon + 'E'
+    timezone.innerHTML = data.city.name;
+    countryEl.innerHTML = data.city.coord.lat + 'N ' + data.city.coord.lon + 'E'
 
 
     currentWeatherItemsEl.innerHTML = 
@@ -58,10 +56,7 @@ function showWeatherData(data){
         <div>Pressure</div>
         <div>${pressure}</div>
     </div>
-    <div class="weather-item">
-        <div>Wind Speed</div>
-        <div>${wind_speed}</div>
-    </div>
+
     <div class="weather-item">
         <div>Sunrise</div>
         <div>${window.moment(sunrise*1000).format('HH:mm a')}</div>
@@ -71,25 +66,71 @@ function showWeatherData(data){
         <div>${window.moment(sunset*1000).format('HH:mm a')}</div>
     </div>`;
 
-    
     let otherDayForcast = ''
-    data.daily.forEach((day, idx) => {
+    data.list.forEach((data, idx) => {
         if(idx == 0){
             currentTempEl.innerHTML = `
-            <img src="http://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png" alt="weather-icon" class="w-icon">
+            <img src="http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="weather-icon" class="w-icon">
             <div class="other">
-                <div class="day">${window.moment(day.dt*1000).format('ddd')}</div>
-                <div class="temp">Day - ${day.temp.day}&#176; c</div>
-                <div class="temp">Night - ${day.temp.night}&#176; c</div>
+                <div class="day">${window.moment(data.dt*1000).format('ddd')}</div>
+                <div class="temp">Day - ${data.main.temp_max}&#176; c</div>
+                <div class="temp">Night - ${data.main.temp_min}&#176; c</div>
             </div>
             `
-        }else{
+        }
+        if(idx == 1){
+            currentTempEl.innerHTML = `
+            <img src="http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="weather-icon" class="w-icon">
+            <div class="other">
+                <div class="day">${window.moment(data.dt*1000).format('ddd')}</div>
+                <div class="temp">Day - ${data.main.temp_max}&#176; c</div>
+                <div class="temp">Night - ${data.main.temp_min}&#176; c</div>
+            </div>
+            `
+        }
+        if(idx==2){
             otherDayForcast += `
             <div class="weather-forecast-item">
-                <div class="day">${window.moment(day.dt*1000).format('ddd')}</div>
-                <img src="http://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png" alt="weather-icon" class="w-icon">
-                <div class="temp">Day - ${day.temp.day}&#176; c</div>
-                <div class="temp">Night - ${day.temp.night}&#176; c</div>
+                <div class="day">${window.moment(data.dt*1000).format('ddd')}</div>
+                <img src="http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="weather-icon" class="w-icon">
+                <div class="temp">Day - ${data.main.temp_max}&#176; c</div>
+                <div class="temp">Night - ${data.main.temp_min}&#176; c</div>
+            </div>
+            `
+        }if(idx==10){
+            otherDayForcast += `
+            <div class="weather-forecast-item">
+                <div class="day">${window.moment(data.dt*1000).format('ddd')}</div>
+                <img src="http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="weather-icon" class="w-icon">
+                <div class="temp">Day - ${data.main.temp_max}&#176; c</div>
+                <div class="temp">Night - ${data.main.temp_min}&#176; c</div>
+            </div>
+            `
+        }if(idx==18){
+            otherDayForcast += `
+            <div class="weather-forecast-item">
+                <div class="day">${window.moment(data.dt*1000).format('ddd')}</div>
+                <img src="http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="weather-icon" class="w-icon">
+                <div class="temp">Day - ${data.main.temp_max}&#176; c</div>
+                <div class="temp">Night - ${data.main.temp_min}&#176; c</div>
+            </div>
+            `
+        }if(idx==26){
+            otherDayForcast += `
+            <div class="weather-forecast-item">
+                <div class="day">${window.moment(data.dt*1000).format('ddd')}</div>
+                <img src="http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="weather-icon" class="w-icon">
+                <div class="temp">Day - ${data.main.temp_max}&#176; c</div>
+                <div class="temp">Night - ${data.main.temp_min}&#176; c</div>
+            </div>
+            `
+        }if(idx==34){
+            otherDayForcast += `
+            <div class="weather-forecast-item">
+                <div class="day">${window.moment(data.dt*1000).format('ddd')}</div>
+                <img src="http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="weather-icon" class="w-icon">
+                <div class="temp">Day - ${data.main.temp_max}&#176; c</div>
+                <div class="temp">Night - ${data.main.temp_min}&#176; c</div>
             </div>
             `
         }
